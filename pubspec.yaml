@@ -19,16 +19,16 @@ dependencies:
   shimmer: ^3.0.0
 
   # State Management
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
-  riverpod: ^2.6.1
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.0
+  riverpod: ^3.1.0
   provider: ^6.1.2
 
   # Local Database & Offline
   sqflite: ^2.4.1
   path_provider: ^2.1.5
-  drift: ^2.22.1
-  drift_flutter: ^0.2.4
+  drift: ^2.31.0
+  drift_flutter: ^0.2.8
 
   # Networking & API
   dio: ^5.7.0
@@ -47,10 +47,10 @@ dependencies:
 
   # In-App Purchase
   in_app_purchase: ^3.2.1
-  purchases_flutter: ^8.1.4
+  purchases_flutter: ^9.12.2
 
   # Utilities
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   uuid: ^4.5.1
   intl: ^0.20.2
@@ -77,11 +77,11 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Code Generation
-  build_runner: ^2.4.13
-  freezed: ^2.5.7
-  json_serializable: ^6.8.0
-  riverpod_generator: ^2.6.2
-  drift_dev: ^2.22.1
+  build_runner: ^2.6.1
+  freezed: ^3.2.3
+  json_serializable: ^6.11.2
+  riverpod_generator: ^4.0.0+1
+  drift_dev: ^2.31.0
 
   # Testing
   mocktail: ^1.0.4
