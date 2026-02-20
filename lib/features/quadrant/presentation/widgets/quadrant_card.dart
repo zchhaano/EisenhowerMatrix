@@ -116,17 +116,18 @@ class _QuadrantCardState extends State<QuadrantCard>
               ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Quadrant Header — long-press here for quick-add
-            GestureDetector(
-              onTap: widget.onTap,
-              onLongPress: widget.onLongPress != null ? _handleLongPress : null,
-              onTapDown: _handleTapDown,
-              onTapUp: _handleTapUp,
-              onTapCancel: _handleTapCancel,
-              child: Container(
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress != null ? _handleLongPress : null,
+          onTapDown: _handleTapDown,
+          onTapUp: _handleTapUp,
+          onTapCancel: _handleTapCancel,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Quadrant Header
+              Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: qColor.withValues(alpha: 0.1),
@@ -175,15 +176,15 @@ class _QuadrantCardState extends State<QuadrantCard>
                   ],
                 ),
               ),
-            ),
-            // Task Content Area — gestures handled by children (LongPressDraggable, etc.)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: widget.child,
+              // Task Content Area
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: widget.child,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -99,37 +99,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _handleTaskComplete(Task task) async {
-    final success = await ref.read(taskListProvider.notifier).completeTask(task.id);
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(task.isCompleted ? 'Task uncompleted' : 'Task completed'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // TODO: Implement undo
-            },
-          ),
-        ),
-      );
-    }
+    await ref.read(taskListProvider.notifier).completeTask(task.id);
   }
 
   void _handleTaskMove(Task task, QuadrantType newQuadrant) async {
-    final success = await ref.read(taskListProvider.notifier).moveTaskToQuadrant(task.id, newQuadrant);
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Task "${task.title}" moved to ${newQuadrant.label}'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // TODO: Implement undo move
-            },
-          ),
-        ),
-      );
-    }
+    await ref.read(taskListProvider.notifier).moveTaskToQuadrant(task.id, newQuadrant);
   }
 
   void _handleTaskDelete(Task task) async {
@@ -152,20 +126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (confirmed == true && mounted) {
-      final success = await ref.read(taskListProvider.notifier).deleteTask(task.id);
-      if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Task "${task.title}" deleted'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {
-                ref.read(taskListProvider.notifier).restoreTask(task.id);
-              },
-            ),
-          ),
-        );
-      }
+      await ref.read(taskListProvider.notifier).deleteTask(task.id);
     }
   }
 
@@ -185,14 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           priority: priority,
           dueDate: dueDate,
         );
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Task added to ${quadrant.label}'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
+        if (mounted) {}
       },
     );
   }
@@ -219,11 +173,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           dueDate: result['dueDate'],
           priority: result['priority'],
         );
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Task updated')),
-          );
-        }
+        if (mounted) {}
       } else {
         // Create new task
         await ref.read(taskListProvider.notifier).createTask(
@@ -233,11 +183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           priority: result['priority'] ?? 0,
           dueDate: result['dueDate'],
         );
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Task created')),
-          );
-        }
+        if (mounted) {}
       }
     }
   }
@@ -245,30 +191,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showFilterMenu(TaskListState state) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const ListTile(title: Text('Filter Tasks')),
-            const Divider(),
-            CheckboxListTile(
-              title: const Text('Show completed'),
-              value: state.filter.status == TaskStatus.completed,
-              onChanged: (value) {
-                Navigator.pop(context);
-                // TODO: Implement filter
-              },
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          final currentState = ref.read(taskListProvider);
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(title: Text('Filter Tasks')),
+                const Divider(),
+                CheckboxListTile(
+                  title: const Text('Show completed'),
+                  value: currentState.filter.status == TaskStatus.completed,
+                  onChanged: (value) {
+                    ref.read(taskListProvider.notifier).toggleCompletedFilter();
+                    setSheetState(() {});
+                  },
+                ),
+                CheckboxListTile(
+                  title: const Text('Show overdue only'),
+                  value: currentState.filter.onlyOverdue ?? false,
+                  onChanged: (value) {
+                    ref.read(taskListProvider.notifier).toggleOverdueFilter();
+                    setSheetState(() {});
+                  },
+                ),
+              ],
             ),
-            CheckboxListTile(
-              title: const Text('Show overdue only'),
-              value: state.filter.onlyOverdue ?? false,
-              onChanged: (value) {
-                Navigator.pop(context);
-                ref.read(taskListProvider.notifier).toggleOverdueFilter();
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

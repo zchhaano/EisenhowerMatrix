@@ -53,7 +53,6 @@ class TaskCard extends StatelessWidget {
           horizontal: 12,
           vertical: verticalPad,
         ),
-        leading: _buildLeading(context),
         title: Text(
           task.title,
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -135,33 +134,41 @@ class TaskCard extends StatelessWidget {
       backgroundColor: Colors.transparent,
       leadingActions: [
         SwipeAction(
-          title: 'Complete',
+          title: task.isCompleted ? 'Reactivate' : 'Complete',
+          style: const TextStyle(fontSize: 12, color: Colors.white),
+          widthSpace: 90,
           onTap: (handler) async {
             handler(false);
             onComplete?.call();
           },
-          color: Colors.green,
-          icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+          color: task.isCompleted ? Colors.orange : Colors.green,
+          icon: Icon(
+            task.isCompleted ? Icons.replay : Icons.check_circle_outline,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
       ],
       trailingActions: [
         SwipeAction(
-          title: 'Edit',
-          onTap: (handler) async {
-            handler(false);
-            onEdit?.call();
-          },
-          color: Colors.blue,
-          icon: const Icon(Icons.edit_outlined, color: Colors.white),
-        ),
-        SwipeAction(
           title: 'Delete',
+          style: const TextStyle(fontSize: 12, color: Colors.white),
           onTap: (handler) async {
             handler(false);
             onDelete?.call();
           },
           color: Colors.red,
-          icon: const Icon(Icons.delete_outline, color: Colors.white),
+          icon: const Icon(Icons.delete_outline, color: Colors.white, size: 20),
+        ),
+        SwipeAction(
+          title: 'Edit',
+          style: const TextStyle(fontSize: 12, color: Colors.white),
+          onTap: (handler) async {
+            handler(false);
+            onEdit?.call();
+          },
+          color: Colors.blue,
+          icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 20),
         ),
       ],
       child: container,
@@ -211,24 +218,6 @@ class TaskCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget? _buildLeading(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final qColor = AppColors.quadrantColor(task.quadrant.index, isDark);
-
-    return Checkbox(
-      value: task.isCompleted,
-      onChanged: (_) => onComplete?.call(),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
-      side: BorderSide(
-        color: qColor.withOpacity(0.5),
-        width: 2,
-      ),
-      activeColor: qColor,
     );
   }
 

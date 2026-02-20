@@ -244,7 +244,18 @@ class TaskListNotifier extends StateNotifier<TaskListState> {
   void toggleOverdueFilter() {
     final newFilter = state.filter.copyWith(
       onlyOverdue: state.filter.onlyOverdue == null ? true : null,
+      clearOnlyOverdue: state.filter.onlyOverdue != null,
     );
+    state = state.copyWith(filter: newFilter);
+    loadTasks();
+  }
+
+  /// Toggle showing completed tasks
+  void toggleCompletedFilter() {
+    final isCurrentlyShowingCompleted = state.filter.status == TaskStatus.completed;
+    final newFilter = isCurrentlyShowingCompleted
+        ? state.filter.copyWith(clearStatus: true)
+        : state.filter.copyWith(status: TaskStatus.completed);
     state = state.copyWith(filter: newFilter);
     loadTasks();
   }
@@ -429,13 +440,38 @@ class TaskListNotifier extends StateNotifier<TaskListState> {
     }
   }
 
-  /// Complete task
+  /// Toggle task completion status
   Future<bool> completeTask(String taskId) async {
+    try {
+      // Read current task to check status
+      final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(taskId))).getSingleOrNull();
+      if (task == null) return false;
+
+      final isCurrentlyCompleted = task.status == TaskStatus.completed;
+
+      await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId))).write(
+        TasksCompanion(
+          status: Value(isCurrentlyCompleted ? TaskStatus.pending : TaskStatus.completed),
+          completedAt: isCurrentlyCompleted ? const Value(null) : Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
+      await loadTasks();
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
+  /// Uncomplete task (undo completion)
+  Future<bool> uncompleteTask(String taskId) async {
     try {
       await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId))).write(
         TasksCompanion(
-          status: const Value(TaskStatus.completed),
-          completedAt: Value(DateTime.now()),
+          status: const Value(TaskStatus.pending),
+          completedAt: const Value(null),
           updatedAt: Value(DateTime.now()),
         ),
       );
