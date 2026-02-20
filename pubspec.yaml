@@ -1,0 +1,96 @@
+name: eisenhower_matrix
+description: "AI-powered Eisenhower Matrix task management app - prioritize what matters most."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # UI & Icons
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  riverpod: ^2.6.1
+  provider: ^6.1.2
+
+  # Local Database & Offline
+  sqflite: ^2.4.1
+  path_provider: ^2.1.5
+  drift: ^2.22.1
+  drift_flutter: ^0.2.4
+
+  # Networking & API
+  dio: ^5.7.0
+  pretty_dio_logger: ^1.4.0
+
+  # Backend & Auth
+  supabase_flutter: ^2.8.3
+
+  # Notifications
+  flutter_local_notifications: ^18.0.1
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.2.0
+
+  # AI Integration
+  http: ^1.2.2
+
+  # In-App Purchase
+  in_app_purchase: ^3.2.1
+  purchases_flutter: ^8.1.4
+
+  # Utilities
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  shared_preferences: ^2.3.3
+  flutter_secure_storage: ^9.2.2
+  logger: ^2.5.0
+  collection: ^1.18.0
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Date/Time
+  timeago: ^3.7.0
+
+  # Charts & Analytics
+  fl_chart: ^0.69.0
+
+  # Gesture & Animation
+  flutter_swipe_action_cell: ^3.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code Generation
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.6.2
+  drift_dev: ^2.22.1
+
+  # Testing
+  mocktail: ^1.0.4
+  bloc_test: ^10.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/

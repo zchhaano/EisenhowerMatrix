@@ -1,0 +1,144 @@
+# Eisenhower Matrix App - Supabase Edge Functions
+# AI Task Classification Function
+
+# File: supabase/functions/ai-classify/index.ts
+"""
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface ClassifyRequest {
+  taskTitle: string;
+  taskDescription?: string;
+  userGoals?: string[];
+}
+
+interface ClassifyResponse {
+  quadrant: number;
+  confidence: number;
+  reasoning: string;
+  suggestedPriority: string;
+  suggestedSubtasks?: string[];
+}
+
+serve(async (req) => {
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    )
+
+    // Verify user
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const { taskTitle, taskDescription, userGoals }: ClassifyRequest = await req.json()
+
+    // Check AI token quota
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('ai_tokens_remaining, subscription_tier')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.ai_tokens_remaining <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'AI quota exceeded' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Call AI model (placeholder - integrate with actual LLM)
+    const classification = await classifyTask(taskTitle, taskDescription, userGoals)
+
+    // Decrement token count
+    await supabaseClient
+      .from('profiles')
+      .update({ ai_tokens_remaining: profile.ai_tokens_remaining - 1 })
+      .eq('id', user.id)
+
+    // Log usage
+    await supabaseClient
+      .from('gamification_logs')
+      .insert({
+        user_id: user.id,
+        action: 'ai_classification',
+        points: 0,
+        metadata: { quadrant: classification.quadrant }
+      })
+
+    return new Response(
+      JSON.stringify(classification),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+})
+
+async function classifyTask(
+  title: string,
+  description?: string,
+  goals?: string[]
+): Promise<ClassifyResponse> {
+  // Placeholder classification logic
+  // In production, call OpenAI/Claude API
+
+  const text = `${title} ${description || ''}`.toLowerCase()
+
+  // Simple rule-based classification
+  let quadrant = 2 // Default to Schedule (Q2)
+  let confidence = 0.6
+
+  // Urgency keywords
+  const urgentKeywords = ['urgent', 'asap', 'emergency', 'critical', 'immediately', 'today', '紧急', '立即']
+  const importantKeywords = ['important', 'critical', 'deadline', 'meeting', 'client', '重要', '关键']
+
+  const hasUrgent = urgentKeywords.some(kw => text.includes(kw))
+  const hasImportant = importantKeywords.some(kw => text.includes(kw))
+
+  if (hasUrgent && hasImportant) {
+    quadrant = 1
+    confidence = 0.85
+  } else if (hasImportant) {
+    quadrant = 2
+    confidence = 0.75
+  } else if (hasUrgent) {
+    quadrant = 3
+    confidence = 0.7
+  } else {
+    quadrant = 2
+    confidence = 0.5
+  }
+
+  return {
+    quadrant,
+    confidence,
+    reasoning: `Based on keywords analysis, this task appears to be ${hasUrgent ? 'urgent' : 'not urgent'} and ${hasImportant ? 'important' : 'not important'}.`,
+    suggestedPriority: quadrant === 1 ? 'urgent' : quadrant === 2 ? 'high' : 'medium'
+  }
+}
+"""
