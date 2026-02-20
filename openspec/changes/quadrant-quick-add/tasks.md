@@ -35,10 +35,10 @@
 
 ## 6. Testing
 
-- [ ] 6.1 Add widget test for long-press gesture on `QuadrantCard`
-- [ ] 6.2 Add widget test for `QuickAddBottomSheet` component
-- [ ] 6.3 Add integration test for complete quick-add flow
-- [ ] 6.4 Test interaction with existing drag-to-resize feature
+- [x] 6.1 Add widget test for long-press gesture on `QuadrantCard`
+- [x] 6.2 Add widget test for `QuickAddBottomSheet` component
+- [x] 6.3 Add integration test for complete quick-add flow
+- [x] 6.4 Test interaction with existing drag-to-resize feature
 
 ## 7. Polish
 
